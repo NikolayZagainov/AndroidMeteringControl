@@ -2,6 +2,7 @@ package com.nikolay.meteringdevice
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
@@ -34,8 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (isTablet(this)) {
+        if (isTablet(this)) {cd
             Log.i(
                 "TheDeviceType",
                 "Detected... You're using a Tablet",
@@ -46,8 +46,11 @@ class MainActivity : AppCompatActivity() {
                 "TheDeviceType",
                 "Detected... You're using a Mobile Phone",
             )
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
             setContentView(R.layout.mobile_activity_main)
         }
+
+
 
         initUI()
         initializeBluetoothOrRequestPermission()
