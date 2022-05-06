@@ -1,14 +1,11 @@
 package com.nikolay.meteringdevice
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.children
 
 
 class MainActivity : AppCompatActivity() {
@@ -147,12 +144,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    @SuppressLint("MissingPermission")
-    override fun onStop() {
-        super.onStop()
-        meteringConnection?.gattConnction?.disconnect()
-        meteringConnection?.gattConnction?.close()
-        deviceConnected = false
-        Log.w("Destroy callback", "On stop called")
+    override fun onResume() {
+        txt_target_rpm?.setText(meteringConnection?.currentRPM.toString())
+        txt_single_misses?.setText(meteringConnection?.singleMisses.toString())
+        txt_double_misses?.setText(meteringConnection?.doubleMisses.toString())
+        txt_total_misses?.setText(meteringConnection?.totalMisses.toString())
+        super.onResume()
     }
 }
