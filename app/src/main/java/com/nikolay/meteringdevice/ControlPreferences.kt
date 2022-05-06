@@ -28,7 +28,9 @@ object ControlPreferences {
 
     fun getRPMsettings(activity: MainActivity)
     {
-        allRPMvalues =  getArrayList("rpms", activity) as MutableList<String>
+        val theVal: ArrayList<String?>? = getArrayList("rpms", activity)
+        if(theVal != null)
+            allRPMvalues =  theVal as MutableList<String>
     }
 
     fun loadRPMSettinngs(activity: MainActivity)

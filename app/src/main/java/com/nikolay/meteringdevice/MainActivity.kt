@@ -1,9 +1,12 @@
 package com.nikolay.meteringdevice
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
@@ -31,7 +34,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        if (isTablet(this)) {
+            Log.i(
+                "TheDeviceType",
+                "Detected... You're using a Tablet",
+            )
+            setContentView(R.layout.activity_main)
+        } else {
+            Log.i(
+                "TheDeviceType",
+                "Detected... You're using a Mobile Phone",
+            )
+            setContentView(R.layout.mobile_activity_main)
+        }
 
         initUI()
         initializeBluetoothOrRequestPermission()
@@ -39,6 +55,13 @@ class MainActivity : AppCompatActivity() {
 
         ControlPreferences.loadRPMSettinngs(this)
 
+
+    }
+
+    fun isTablet(context: Context): Boolean {
+        return ((context.resources.configuration.screenLayout
+                and Configuration.SCREENLAYOUT_SIZE_MASK)
+                >= Configuration.SCREENLAYOUT_SIZE_LARGE)
     }
 
     private fun initUI()

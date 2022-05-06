@@ -38,7 +38,9 @@
                     android:id="@+id/btn_add_rpm"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:srcCompat="@android:drawable/ic_input_add" />
+                    android:contentDescription="@string/all_rpm_value"
+                    app:srcCompat="@android:drawable/ic_input_add"
+                    tools:ignore="ImageContrastCheck" />
             </LinearLayout>
         </ScrollView>
 
@@ -54,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Connect"
+        android:text="@string/connect"
         app:layout_constraintEnd_toStartOf="@+id/btn_start_scan"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +66,7 @@
         android:id="@+id/lbl_scan_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="not scanning"
+        android:text="@string/not_scanning"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -75,7 +77,7 @@
         android:id="@+id/txt_status"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:text="not connected"
+        android:text="@string/not_connected"
         android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@+id/lbl_scan_status"
         app:layout_constraintHorizontal_bias="0.5"
@@ -86,7 +88,7 @@
         android:id="@+id/btn_start_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start scanning"
+        android:text="@string/start_scanning"
         app:layout_constraintEnd_toStartOf="@+id/txt_status"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_connect"
@@ -118,7 +120,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Target RPM"
+                android:text="@string/target_rpm"
                 android:textSize="16sp" />
 
             <TextView
@@ -126,7 +128,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center|center_vertical"
-                android:text="0"
+                android:text="@string/zero_init"
                 android:textSize="48sp" />
         </LinearLayout>
 
@@ -143,7 +145,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Single misses"
+                android:text="@string/single_misses"
                 android:textSize="16sp" />
 
             <TextView
@@ -151,7 +153,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center|center_vertical"
-                android:text="0"
+                android:text="@string/zero_init"
                 android:textSize="48sp" />
         </LinearLayout>
 
@@ -168,7 +170,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Double misses"
+                android:text="@string/double_misses"
                 android:textSize="16sp" />
 
             <TextView
@@ -176,7 +178,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center|center_vertical"
-                android:text="0"
+                android:text="@string/zero_init"
                 android:textSize="48sp" />
         </LinearLayout>
 
@@ -193,7 +195,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Total misses"
+                android:text="@string/total_misses"
                 android:textSize="16sp" />
 
             <TextView
@@ -201,7 +203,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:gravity="center|center_vertical"
-                android:text="0"
+                android:text="@string/zero_init"
                 android:textSize="48sp" />
         </LinearLayout>
 
@@ -214,7 +216,7 @@
         android:layout_height="87dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Start"
+        android:text="@string/start"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
