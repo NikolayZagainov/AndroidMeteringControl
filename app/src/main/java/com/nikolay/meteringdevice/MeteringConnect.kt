@@ -12,6 +12,7 @@ import android.widget.Toast
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.nio.ByteBuffer
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -31,6 +32,8 @@ class MeteringConnect(private val context: Context) {
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
+
+    val callingDescriptors = mutableListOf(seedMiss, cmd)
 
     @SuppressLint("MissingPermission")
     private fun startBleScan()
@@ -117,7 +120,10 @@ class MeteringConnect(private val context: Context) {
             with(gatt) {
                 Log.w("BluetoothGattCallback", "Discovered ${services.size} services for" +
                         " ${device.address}")
-                subscribeToseedMiss()
+                if(callingDescriptors.isNotEmpty())
+                {
+                    subscribeToChar(callingDescriptors[0])
+                }
             }
         }
 
@@ -186,17 +192,23 @@ class MeteringConnect(private val context: Context) {
                 when (status)
                 {
                     BluetoothGatt.GATT_SUCCESS -> {
-                        onDeviceConnected()
                         Log.i("BluetoothGattCallback", "Wrote to descriptor " +
                                 "${this?.uuid} | value: ${this?.value?.toHexString()}")
+                        callingDescriptors.removeFirst()
+                        if(callingDescriptors.isNotEmpty())
+                        {
+                            subscribeToChar(callingDescriptors[0])
+                        } else {
+                            onDeviceConnected()
+                        }
                     }
                     else -> {
-                        if(this?.uuid == seedMisslDescUuid)
+                        if(callingDescriptors.isNotEmpty())
                         {
-                            Toast.makeText(context, "Failed to sibscribe to ${charMap[seedMissUuid]}",
-                                Toast.LENGTH_SHORT).show()
-                            subscribeToseedMiss()
-                        }
+                            subscribeToChar(callingDescriptors[0])
+                        } else {}
+                        Toast.makeText(context, "Failed to sibscribe to ${charMap[this?.uuid]}",
+                            Toast.LENGTH_SHORT).show()
                         Log.e("BluetoothGattCallback", "Descriptor write failed " +
                                 "for ${this?.uuid}, error: $status")
 
@@ -224,18 +236,6 @@ class MeteringConnect(private val context: Context) {
     fun ByteArray.toHexString(): String =
         joinToString(separator = " ", prefix = "0x") { String.format("%02X", it) }
 
-    @SuppressLint("MissingPermission")
-    private fun subscribeToseedMiss() {
-
-        val seedMissChar = gattConnction?.getService(meteringServiceUuid)?.getCharacteristic(
-            seedMissUuid)
-
-        gattConnction?.setCharacteristicNotification(seedMissChar, true)
-        var descriptor: BluetoothGattDescriptor? = seedMissChar?.getDescriptor(seedMisslDescUuid)
-        descriptor?.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-        gattConnction?.writeDescriptor(descriptor)
-        gattConnction?.setCharacteristicNotification(seedMissChar, true)
-    }
 
     @SuppressLint("MissingPermission")
     private fun readRPMLevel() {
@@ -270,6 +270,27 @@ class MeteringConnect(private val context: Context) {
     }
 
     @SuppressLint("MissingPermission")
+    fun writeCMD(cmdValue: ByteArray) {
+        val cmdChar = gattConnction?.getService(meteringServiceUuid)?.getCharacteristic(
+            cmdUuid)
+        if (cmdChar != null) {
+            writeCharacteristic(cmdChar, cmdValue)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun subscribeToChar(uuidPair:UIDAPair) {
+        val theChar = gattConnction?.getService(meteringServiceUuid)?.getCharacteristic(
+            uuidPair.uuid)
+
+        gattConnction?.setCharacteristicNotification(theChar, true)
+        val descriptor: BluetoothGattDescriptor? = theChar?.getDescriptor(uuidPair.desc)
+        descriptor?.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+        gattConnction?.writeDescriptor(descriptor)
+        gattConnction?.setCharacteristicNotification(theChar, true)
+    }
+
+    @SuppressLint("MissingPermission")
     fun writeCharacteristic(characteristic: BluetoothGattCharacteristic, payload: ByteArray) {
         gattConnction?.let { gatt ->
             characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -285,10 +306,10 @@ class MeteringConnect(private val context: Context) {
         {
             gattConnction = theDevice?.connectGatt(this@MeteringConnect.context,
                 false, gattCallback)
-            (context as MainActivity).btn_connect?.setEnabled(false)
+            (context as MainActivity).btn_connect.setEnabled(false)
             the_timer_handler?.cancel()
             the_timer_handler = Timer().schedule(1000) {
-                (context as MainActivity).btn_connect?.setEnabled(true)
+                (context as MainActivity).btn_connect.setEnabled(true)
             }
         }
         else
@@ -301,6 +322,8 @@ class MeteringConnect(private val context: Context) {
 
     companion object
     {
+        data class UIDAPair(val uuid:UUID, val desc:UUID)
+
         private val THE_DEVICE_NAME: String = "MeteringDevice"
         private val meteringServiceUuid: UUID = UUID.fromString("00009950-0000-1000-8000-00805f9b34fb")
 
@@ -310,12 +333,23 @@ class MeteringConnect(private val context: Context) {
 
         private val seedMissUuid: UUID = UUID.fromString("00001a02-0000-1000-8000-00805f9b34fb")
         private val seedMisslDescUuid: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+        private val seedMiss = UIDAPair(seedMissUuid, seedMisslDescUuid)
+
+        private val cmdUuid: UUID = UUID.fromString("00001a03-0000-1000-8000-00805f9b34fb")
+        private val cmdDescUuid: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+        private val cmd = UIDAPair(cmdUuid, cmdDescUuid)
 
         private  val charMap = hashMapOf(
             speedLevelCharUuid to "rpm value",
             startCharUuid to "start state value",
-            seedMissUuid to "seed miss value"
+            seedMissUuid to "seed miss value",
+            cmdUuid to "command value"
         )
+
+        lateinit var instance: MeteringConnect
+        lateinit var var_context: Context
+
+
     }
 
 
@@ -335,6 +369,7 @@ class MeteringConnect(private val context: Context) {
 //        }
 //    }
     init {
+        instance = this
         bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter =  bluetoothManager?.getAdapter()
         if (bluetoothAdapter != null) {
@@ -348,14 +383,14 @@ class MeteringConnect(private val context: Context) {
         {
             Log.i("MDC", "no support for bluetooth")
         }
-        (context as MainActivity).btn_start_scan?.setOnClickListener {
+        (context as MainActivity).btn_start_scan.setOnClickListener {
             if (context.isScanning) {
                 stopBleScan()
             } else {
                 startBleScan()
             }
         }
-        (context as MainActivity).btn_connect?.setOnClickListener {
+        (context as MainActivity).btn_connect.setOnClickListener {
             if (context.deviceConnected) {
                 gattConnction?.disconnect()
                 gattConnction?.close()
@@ -388,7 +423,7 @@ class MeteringConnect(private val context: Context) {
         field = value
         val ma = context as MainActivity
         ma.runOnUiThread {
-            ma.btn_start?.text = if (value) "Stop" else "Start"
+            ma.btn_start.text = if (value) "Stop" else "Start"
         }
     }
     var currentRPM: UByte = 0u
@@ -396,28 +431,28 @@ class MeteringConnect(private val context: Context) {
             field = value
             val ma = context as MainActivity
             ma.runOnUiThread {
-                ma.txt_target_rpm?.text = value.toString()
+                ma.txt_target_rpm.text = value.toString()
             }
         }
     var singleMisses = 0
         set(value) {
             field = value
             val ma = context as MainActivity
-            ma.txt_single_misses?.text = value.toString()
+            ma.txt_single_misses.text = value.toString()
             if (value != 0) totalMisses ++
         }
     var doubleMisses = 0
         set(value) {
             field = value
             val ma = context as MainActivity
-            ma.txt_double_misses?.text = value.toString()
+            ma.txt_double_misses.text = value.toString()
             if (value != 0) totalMisses += 2
         }
     var totalMisses = 0
         set(value) {
             field = value
             val ma = context as MainActivity
-            ma.txt_total_misses?.text = value.toString()
+            ma.txt_total_misses.text = value.toString()
         }
 
 
@@ -444,17 +479,25 @@ class MeteringConnect(private val context: Context) {
     private fun onValueHaveRead(valId: UUID, value: ByteArray)
     {
         updateUistate(valId, value)
+
     }
 
     private fun onValueHasWritten(valId: UUID, value: ByteArray)
     {
-        updateUistate(valId, value)
+        if(valId == cmdUuid) {
+            if (value[4].toInt().toChar() != 'U') updateUistate(valId, value)
+        }
+        else {
+            updateUistate(valId, value)
+        }
     }
 
     private  fun onValueChanged(valId: UUID, value: ByteArray)
     {
         updateUistate(valId, value)
     }
+
+
 
     private fun updateUistate(valId: UUID, value: ByteArray)
     {
@@ -475,7 +518,30 @@ class MeteringConnect(private val context: Context) {
                     else -> { totalMisses += valInt }
                 }
             }
+            cmdUuid -> {
+                val value_part = value.copyOf(value.lastIndex)
+                var string_part:String = ""
+                val the_command = value[value.lastIndex].toInt().toChar()
+                when(the_command)
+                {
+                    'S' -> {
+                        string_part = value[0].toInt().toChar().toString()
+                    }
+                    else -> {
+                        val float_value = toFloat(value_part.reversedArray())
+                        string_part = float_value.toString()
+                    }
+                }
+                (var_context as SettingsActivity).runOnUiThread(Runnable {
+                    Toast.makeText(var_context, "The value is set to: $string_part",
+                        Toast.LENGTH_SHORT).show()
+                })
+            }
         }
+    }
+
+    fun toFloat(bytes: ByteArray): Float {
+        return ByteBuffer.wrap(bytes).float
     }
 
 }

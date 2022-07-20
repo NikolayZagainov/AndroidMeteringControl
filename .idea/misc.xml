@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/layout/activity_main.xml" value="0.2949978623343309" />
-        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/layout/mobile_activity_main.xml" value="0.2992731936725096" />
+        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.3645" />
+        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/layout/activity_main.xml" value="0.18177083333333333" />
+        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/layout/device_settings.xml" value="0.18177083333333333" />
+        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/layout/mobile_activity_main.xml" value="0.2984181274048739" />
+        <entry key="..\:/projects/AndroidStudio/MeteringDevice/app/src/main/res/layout/settings_activity.xml" value="0.18177083333333333" />
       </map>
     </option>
   </component>

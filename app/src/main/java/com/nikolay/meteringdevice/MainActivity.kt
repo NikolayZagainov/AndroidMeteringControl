@@ -1,7 +1,9 @@
 package com.nikolay.meteringdevice
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -14,16 +16,18 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     // UI
-    var btn_connect: Button? = null
-    var btn_start_scan: Button? = null
-    var btn_start: Button? = null
-    var btn_add_rpm: ImageButton? = null
-    var txt_target_rpm: TextView? = null
-    var txt_single_misses: TextView? = null
-    var txt_double_misses: TextView? = null
-    var txt_total_misses: TextView? = null
+    lateinit var btn_connect: Button
+    lateinit var btn_start_scan: Button
+    lateinit var btn_start: Button
+    lateinit var btn_add_rpm: ImageButton
+    lateinit var btn_settings:ImageButton
+    lateinit var txt_target_rpm: TextView
+    lateinit var txt_single_misses: TextView
+    lateinit var txt_double_misses: TextView
+    lateinit var txt_total_misses: TextView
 
-    var lt_rpm_values: LinearLayout? = null
+    lateinit var lt_rpm_values: LinearLayout
+
 
     // bluetooth
     private val BLUETOOTH_PERMISSION_REQUEST_CODE: Int = 1
@@ -33,9 +37,10 @@ class MainActivity : AppCompatActivity() {
 
     //device
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (isTablet(this)) {cd
+        if (isTablet(this)) {
             Log.i(
                 "TheDeviceType",
                 "Detected... You're using a Tablet",
@@ -74,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         btn_start_scan = findViewById(R.id.btn_start_scan)
         btn_start = findViewById(R.id.btn_start)
         btn_add_rpm = findViewById(R.id.btn_add_rpm)
+        btn_settings = findViewById(R.id.btn_settings)
 
         //labels
         txt_scan_status = findViewById(R.id.lbl_scan_status)
@@ -89,29 +95,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun initActions()
     {
-        meteringConnection?.setStartButton(btn_start)
+        meteringConnection?.setStartButton(this.btn_start)
 
-        btn_add_rpm?.setOnClickListener {
+        btn_add_rpm.setOnClickListener {
             val rpm_entry = RPMEntry(this@MainActivity)
-            lt_rpm_values?.addView(rpm_entry, lt_rpm_values!!.childCount - 1)
+            lt_rpm_values.addView(rpm_entry, lt_rpm_values.childCount - 1)
             ControlPreferences.saveRPMsettings(this)
         }
-        txt_single_misses?.setOnClickListener {
+        txt_single_misses.setOnClickListener {
             meteringConnection?.singleMisses = 0
         }
-        txt_double_misses?.setOnClickListener {
+        txt_double_misses.setOnClickListener {
             meteringConnection?.doubleMisses = 0
         }
-        txt_total_misses?.setOnClickListener {
+        txt_total_misses.setOnClickListener {
             meteringConnection?.totalMisses = 0
         }
+
+        btn_settings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     // Device related
     var deviceStarted = false
         set(value) {
             field = value
-            btn_start?.text = if (value) "Stop device" else "Start device"
+            btn_start.text = if (value) "Stop device" else "Start device"
         }
 
 
@@ -155,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         set(value) {
             field = value
             runOnUiThread {
-                btn_start_scan?.text = if (value) "Stop Scan" else "Start Scan"
+                btn_start_scan.text = if (value) "Stop Scan" else "Start Scan"
                 txt_scan_status?.text = if (value) "is scanning" else "not scanning"
             }
         }
@@ -164,17 +176,17 @@ class MainActivity : AppCompatActivity() {
         set(value) {
             field = value
             runOnUiThread {
-                btn_connect?.text = if (value) "Disconnect" else "Connect"
-                btn_connect?.setEnabled(true)
+                btn_connect.text = if (value) "Disconnect" else "Connect"
+                btn_connect.setEnabled(true)
                 txt_status?.text = if (value) "is connected" else "disconnected"
             }
         }
 
     override fun onResume() {
-        txt_target_rpm?.setText(meteringConnection?.currentRPM.toString())
-        txt_single_misses?.setText(meteringConnection?.singleMisses.toString())
-        txt_double_misses?.setText(meteringConnection?.doubleMisses.toString())
-        txt_total_misses?.setText(meteringConnection?.totalMisses.toString())
+        txt_target_rpm.setText(meteringConnection?.currentRPM.toString())
+        txt_single_misses.setText(meteringConnection?.singleMisses.toString())
+        txt_double_misses.setText(meteringConnection?.doubleMisses.toString())
+        txt_total_misses.setText(meteringConnection?.totalMisses.toString())
         super.onResume()
     }
 }

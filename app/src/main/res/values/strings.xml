@@ -11,4 +11,37 @@
     <string name="double_misses">Double misses</string>
     <string name="total_misses">Total misses</string>
     <string name="start">Start</string>
+    <string name="spinner_speak">Select parameters for metering device</string>
+    <string name="parameter_input">Input parameter box</string>
+    <string name="set_parameter">Set parameter</string>
+    <string name="please_enter_the_value_and_select_the_parameter">Please enter the value and select the parameter</string>
+    <string name="check_parameter">Check parameter</string>
+    <string name="close">Close</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="setting_button">Button to open the settings</string>
+    
+    <string-array name="device_params">
+        <item>Sin acceleration mode</item>
+        <item>Phase correction</item>
+        <item>Length correction</item>
+        <item>Step increase, single miss coefficient</item>
+        <item>Step increase, double miss coefficient</item>
+        <item>Sin increase, single miss coefficient</item>
+        <item>Sin increase, double miss coefficient</item>
+    </string-array>
 </resources>
